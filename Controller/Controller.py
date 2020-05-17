@@ -275,7 +275,7 @@ class Controller:
             if contacto == None:
                 self.view.error('EL CONTACTO NO EXISTE')
             else:
-                self.view.error('PROBLEMA AL LLER EL CONTACTO. REVISA')
+                self.view.error('PROBLEMA AL LEER EL CONTACTO. REVISA')
         return
     
     def read_all_contactos(self):

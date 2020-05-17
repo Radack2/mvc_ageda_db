@@ -71,7 +71,7 @@ class View:
         print('Ciudad: ', record[2])
         print('Estado: ', record[3])
         print('Fecha: ', record[4])
-        print('Asunto: ', record[4])
+        print('Asunto: ', record[5])
 
     def show_cita_header(self, header):
         print(header.center(48, '*'))
@@ -109,10 +109,10 @@ class View:
         print('No Exterior: ', record[5])
         print('No INterior: ', record[6])
         print('Colonia: ', record[7])
-        print('Ciudad: ', record[11])
-        print('Estado: ', record[12])
-        print('Email: ', record[9])
-        print('Telefono: ', record[10])
+        print('Ciudad: ', record[8])
+        print('Estado: ', record[9])
+        print('Email: ', record[10])
+        print('Telefono: ', record[11])
         
     def show_a_contacto_brief(self, record):
         print('ID: ', record[0])
