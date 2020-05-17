@@ -98,7 +98,7 @@ class View:
         print('3. Leer todos los Contactos')
         print('4. Actualizar Contactos')
         print('5. Borrar Contactos')
-        print('7. Regresar')
+        print('6. Regresar')
 
     def show_a_contacto(self, record):
         print('ID: ', record[0])

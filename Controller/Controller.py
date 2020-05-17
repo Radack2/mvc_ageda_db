@@ -222,6 +222,7 @@ class Controller:
             elif o == '5':
                 self.delete_contacto()
             elif o == '6':
+                self.main_menu()
                 return
             else:
                 self.view.not_valid_option()
@@ -306,7 +307,7 @@ class Controller:
             return
         self.view.msg('Ingresa los valores a modificar (vacio para dejarlo igual): ')
         whole_vals = self.ask_contacto()
-        fields, vals = self.update_lists(['c_nombre', 'c_apellidoP', 'c_apellidoM', 'c_calle', 'c_noext', 'c_noint', 'c_col', 'c_zip', 'c_email', 'c_telefono'], whole_vals)
+        fields, vals = self.update_lists(['c_nombre', 'c_apellidoP', 'c_apellidoM', 'c_calle', 'c_noext', 'c_noint', 'c_col', 'c_ciudad','c_estado', 'c_email', 'c_telefono'], whole_vals)
         vals.append(id_contacto)
         vals = tuple(vals)
         out = self.model.update_contacto(fields, vals)

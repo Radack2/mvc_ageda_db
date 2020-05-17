@@ -114,7 +114,7 @@ class Model:
     """
     def create_contacto(self, name, apellidoP, apellidoM, calle, noext, noint, col, ciudad, estado, email, phone):
         try:
-            sql = 'INSERT INTO contacto (`c_nombre`, `c_apellidoP`, `c_apellidoM`, `c_calle`, `c_noext`, `c_noint`, `c_col`, `c_ciudad`,`c_estado`, `c_email`, `c_telefono`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)'
+            sql = 'INSERT INTO clients (`c_nombre`, `c_apellidoP`, `c_apellidoM`, `c_calle`, `c_noext`, `c_noint`, `c_col`, `c_ciudad`,`c_estado`, `c_email`, `c_telefono`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
             vals = ( name, apellidoP, apellidoM, calle, noext, noint, col, ciudad, estado, email, phone )
             self.cursor.execute(sql, vals)
             self.cnx.commit()
@@ -125,7 +125,7 @@ class Model:
     
     def read_a_contacto(self, id_contacto):
         try:
-            sql =  'SELECT contacto.*,zips.z_city,zips.z_state FROM contacto JOIN zips ON contacto.c_zip = zips.zip and contacto.id_client = %s'
+            sql =  'SELECT contacto.*, detalles_cita.nombre, detalles_cita.descripcion FROM contacto JOIN detalles_cita ON contacto.id_contacto = detalles_cita.id_contacto and detalles_cita.id_client = %s'
             vals = (id_contacto,)
             self.cursor.execute(sql, vals)
             records = self.cursor.fetchone()
@@ -135,7 +135,7 @@ class Model:
 
     def read_all_contactos(self):   #Caution with large amount of data
         try:
-            sql =  'SELECT contacto.*,zips.z_city, zips.z_state FROM contacto JOIN zips ON contacto.c_zip = zips.zip'
+            sql =  'SELECT contacto.*, detalles_cita.nombre, detalles_cita.descripcion FROM contacto JOIN detalles_cita ON contacto.id_contacto = detalles_cita.id_contacto'
             self.cursor.execute(sql)
             records = self.cursor.fetchall()
             return records
