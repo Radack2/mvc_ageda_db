@@ -20,10 +20,9 @@ class View:
         print('************************')
         print('* -- Menu Principal -- *')
         print('************************')
-        print('1. CPs')
-        print('2. Citas')
-        print('3. Contactos')
-        print('4. Salir')
+        print('1. Citas')
+        print('2. Contactos')
+        print('3. Salir')
 
     def option(self, last):
         print('Selecciona una opcion (1-'+last+'): ', end = '')
@@ -46,38 +45,6 @@ class View:
         print(' ¡ERROR! '.center(len(err) +4, '-'))
         print('- '+err+' -')
         print('-'*(len(err)+4))
-
-
-    """
-    *******************************
-    *        View for zip         *
-    *******************************
-    """
-    def zips_menu(self):
-        print('*********************')
-        print('* -- Submenu CPs -- *')
-        print('*********************')
-        print('1. Agregar CP')
-        print('2. Mostrar CP')
-        print('3. Mostrar todos los CPs')
-        print('4. Mostrar CPs de una ciudad')
-        print('5. Actualizar CP')
-        print('6. Borrar CP')
-        print('7. Regresar')
-
-    def show_a_zip(self, record):
-        print(f'{record[0]:<6}|{record[1]:<35}|{record[2]:<35}')
-
-    def show_zip_header(self, header):
-        print(header.center(78, '*'))
-        print('CP'.ljust(6)+ '|'+'ciudad'.ljust(35)+'|'+'Estado'.ljust(35))
-        print('-'*78)
-
-    def show_zip_midder(self):
-        print('-'*78)
-
-    def show_zip_footer(self):
-        print('*'*78)
 
     
     """
@@ -129,9 +96,8 @@ class View:
         print('1. Agregar Contactos')
         print('2. Leer Contactos')
         print('3. Leer todos los Contactos')
-        print('4. Leer Contactos de un CP')
-        print('5. Actualizar Contactos')
-        print('6. Borrar Contactos')
+        print('4. Actualizar Contactos')
+        print('5. Borrar Contactos')
         print('7. Regresar')
 
     def show_a_contacto(self, record):
@@ -145,7 +111,6 @@ class View:
         print('Colonia: ', record[7])
         print('Ciudad: ', record[11])
         print('Estado: ', record[12])
-        print('CP: ', record[8])
         print('Email: ', record[9])
         print('Telefono: ', record[10])
         

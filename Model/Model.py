@@ -28,76 +28,6 @@ class Model:
     def close_db(self):
         self.cnx.close()
 
-
-    """
-    ******************************
-    ZIP methods
-    ******************************
-    """
-
-    def create_zip(self,zip, ciudad, estado):
-        try:
-            sql = 'INSERT INTO zips (`zip`, `z_ciudad`, `z_estado`) VALUES (%S, %S, %S)'
-            vals = (zip, ciudad, estado)
-            self.cursor.execute(sql, vals)
-            self.cnx.commit()
-            return True
-        except connector.Error as err:
-            self.cnx.rollback()
-            return err
-
-    def read_a_zip(self, zip):
-        try:
-            sql =  'SELECT * FROM zips WHERE zip = %s'
-            vals = (zip,)
-            self.cursor.execute(sql, vals)
-            record = self.cursor.fetchone()
-            return record
-        except connector.Error as err:
-            return err
-
-    def read_all_zips(self):
-        try:
-            sql =  'SELECT * FROM zips'
-            self.cursor.execute(sql)
-            record = self.cursor.fetchall()
-            return record
-        except connector.Error as err:
-            return err
-
-    def read_zips_city(self, city):
-        try:
-            sql =  'SELECT * FROM zips WHERE z_ciudad = %s'
-            vals = (city,)
-            self.cursor.execute(sql, vals)
-            record = self.cursor.fetchall()
-            return record
-        except connector.Error as err:
-            return err
-
-    def update_zip(self, fields, vals):
-        try:
-            sql =  'UPDATE zips SET '+','.join(fields)+' WHERE zip = %s'
-            self.cursor.execute(sql, vals)
-            self.cnx.commit()
-            return True
-        except connector.Error as err:
-            self.cnx.rollback()
-            return err
-
-    def delete_zip(self,zip):
-        try:
-            sql =  'DELETE FROM zips WHERE zip = %s'
-            vals = (zip,)
-            self.cursor.execute(sql, vals)
-            self.cnx.commit()
-            count = self.cursor.rowcount
-            return count
-        except connector.Error as err:
-            self.cnx.rollback()
-            return err
-
-
     """
     ******************************
     *       Date methods     *
@@ -182,10 +112,10 @@ class Model:
     *       Contacto methods     *
     ******************************
     """
-    def create_contacto(self, name, apellidoP, apellidoM, calle, noext, noint, col, zip, email, phone):
+    def create_contacto(self, name, apellidoP, apellidoM, calle, noext, noint, col, ciudad, estado, email, phone):
         try:
-            sql = 'INSERT INTO clients (`c_nombre`, `c_apellidoP`, `c_apellidoM`, `c_calle`, `c_noext`, `c_noint`, `c_col`, `c_zip`, `c_email`, `c_telefono`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-            vals = ( name, apellidoP, apellidoM, calle, noext, noint, col, zip, email, phone )
+            sql = 'INSERT INTO clients (`c_nombre`, `c_apellidoP`, `c_apellidoM`, `c_calle`, `c_noext`, `c_noint`, `c_col`, `c_ciudad`,`c_estado`, `c_email`, `c_telefono`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)'
+            vals = ( name, apellidoP, apellidoM, calle, noext, noint, col, ciudad, estado, email, phone )
             self.cursor.execute(sql, vals)
             self.cnx.commit()
             return True
@@ -207,16 +137,6 @@ class Model:
         try:
             sql =  'SELECT contacto.*,zips.z_city, zips.z_state FROM contacto JOIN zips ON contacto.c_zip = zips.zip'
             self.cursor.execute(sql)
-            records = self.cursor.fetchall()
-            return records
-        except connector.Error as err:
-            return err
-
-    def read_contactos_zip(self, zip):
-        try:
-            sql =  'SELECT contacto.*,zips.z_city,zips.z_state FROM contacto JOIN zips ON contacto.c_zip = zips.zip and contacto.c_zip = %s'
-            vals = (zip,)
-            self.cursor.execute(sql, vals)
             records = self.cursor.fetchall()
             return records
         except connector.Error as err:
