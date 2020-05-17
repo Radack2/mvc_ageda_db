@@ -1,0 +1,590 @@
+from Model.Model import Model
+from View.View import View
+from datetime import date
+
+
+class Controller:
+    """
+    *********************************
+    *  A controller for a store DB  *
+    *********************************
+    """
+    def __init__(self):
+        self.model = Model()
+        self.view = View()
+
+    def start(self):
+        self.view.start()
+        self.main_menu()
+
+
+    """
+    *********************************
+    *       General Controller      *
+    *********************************
+    """
+    def main_menu(self):
+        o = '0'
+        while 0 != '4':
+            self.view.main_menu()
+            self.view.option('4')
+            o = input()
+            if o == '1':
+                self.zips_menu()
+            elif o == '2':
+                self.cita_menu()
+            elif o == '3':
+                self.contacto_menu()
+            elif o == '4':
+                self.view.end()
+            else:
+                self.view.not_valid_option()
+        return
+
+    def update_lists(self, fs, vs):
+        fields = []
+        vals = []
+        for f,v in zip(fs,vs):
+            if v != '':
+                fields.append(f+' = %s')
+                vals.append(v)
+        return fields,vals
+
+
+    """
+    *********************************
+    *   Controllers for zips        *
+    *********************************
+    """
+    def zips_menu(self):
+        o = '0'
+        while o != '7':
+            self.view.zips_menu()
+            self.view.option('7')
+            o = input()
+            if o == '1':
+                self.create_zip()
+            elif o == '2':
+                self.read_a_zip()
+            elif o == '3':
+                self.read_all_zips()
+            elif o == '4':
+                self.read_zips_city()
+            elif o == '5':
+                self.update_zip()
+            elif o == '6':
+                self.delete_zip()
+            elif o == '7':
+                return
+            else:
+                self.view.not_valid_option()
+        return
+
+    def ask_zip(self):
+        self.view.ask('Ciudad: ')
+        ciudad = input()
+        self.view.ask('Estado: ')
+        estado = input()
+        return [ciudad, estado]
+
+    def create_zip(self):
+        self.view.ask('CP: ')
+        i_zip = input()
+        ciudad, estado = self.ask_zip()
+        out = self.model.create_zip(i_zip, ciudad, estado)
+        if out == True:
+            self.view.ok(i_zip, 'agrego')
+        else:
+            if out.errno == 1062:
+                self.view.error('EL CP ESTA REPETIDO')
+            else:
+                self.view.error('NO SE PUDO AGREGAR EL CP. REVISA.')
+        return
+
+    def read_a_zip(self):
+        self.view.ask('CP: ')
+        i_zip = input()
+        zip = self.model.read_a_zip(i_zip)
+        if type(zip) == tuple:
+            self.view.show_zip_header(' Datos del CP '+i_zip+' ')
+            self.view.show_a_zip(zip)
+            self.view.show_zip_midder()
+            self.view.show_zip_footer()
+        else:
+            if zip == None:
+                self.view.error('EL CP ESTA EXISTE')
+            else:
+                self.view.error('PROBLEMA AL LEER EL CP. REVISA.')
+
+    def read_all_zips(self):
+        zips = self.model.read_all_zips()
+        if type(zips) == list:
+            self.view.show_zip_header(' Todos los CPs ')
+            for zip in zips:
+                self.view.show_a_zip(zip)
+            self.view.show_zip_midder()
+            self.view.show_zip_footer()
+        else:
+            self.view.error('PROBLEMA AL LEER LOS CPs. REVISA.')
+        return
+
+    def read_zips_city(self):
+        self.view.ask('Ciudad: ')
+        ciudad = input()
+        zips = self.model.read_zips_city(ciudad)
+        if type(zips) == list:
+            self.view.show_zip_header(' CPs para la ciudad de '+ciudad+' ')
+            for zip in zips:
+                self.view.show_a_zip(zip)
+            self.view.show_zip_midder()
+            self.view.show_zip_footer()
+        else:
+            self.view.error('PROBLEMA AL LEER LOS CPs. REVISA.')
+        return
+
+    def update_zip(self):
+        self.view.ask('CP a modificar: ')
+        i_zip = input()
+        zip = self.model.read_a_zip(i_zip)
+        if type(zip) == tuple:
+            self.view.show_zip_header(' Datos del CP '+i_zip+' ')
+            self.view.show_a_zip(zip)
+            self.view.show_zip_midder()
+            self.view.show_zip_footer()
+        else:
+            if zip == None:
+                self.view.error('EL CP NO EXISTE')
+            else:
+                self.view.error('PROBLEMA AL LEER EL CP. REVISA.')
+        self.view.msg('Ingresa los valores a modificar (vacio para dejarlo igual): ')
+        whole_vals = self.ask_zip()
+        fields, vals = self.update_lists(['z_city', 'z_state'], whole_vals)
+        vals.append(i_zip)
+        vals = tuple(vals)
+        out = self.model.update_zip(fields, vals)
+        if out == True:
+            self.view.ok(i_zip, 'actualizo')
+        else:
+            self.view.error('NO SE PUEDE ACTUALIZAR EL CP. REVISA')
+        return
+
+    def delete_zip(self):
+            self.view.ask('CP a Borrar: ')
+            i_zip = input()
+            count = self.model.delete_zip(i_zip)
+            # print(out)
+            if count != 0:
+                self.view.ok(i_zip, 'borro')
+            else:
+                if count == 0:
+                    self.view.error('EL CP NO EXISTE')
+                else:
+                    self.view.error('PROBLEMA AL BORRAR EL CP. REVISA')
+            return
+    
+
+    """
+    *********************************
+    *     Controllers for dates     *
+    *********************************
+    """
+    def cita_menu(self):
+        o = '0'
+        while o != '8':
+            self.view.cita_menu()
+            self.view.option('8')
+            o = input()
+            if o == '1':
+                self.create_cita()
+            elif o == '2':
+                self.read_a_cita()
+            elif o == '3':
+                self.read_all_citas()
+            elif o == '4':
+                self.read_citas_asunto()
+            elif o == '5':
+                self.read_cita_fecha()
+            elif o == '6':
+                self.update_cita()
+            elif o == '7':
+                self.delete_cita()
+            elif o == '8':
+                return
+            else:
+                self.view.not_valid_option()
+        return
+    
+    def ask_cita(self):
+        self.view.ask('Lugar: ')
+        lugar = input()
+        self.view.ask('Ciudad: ')
+        ciudad = input()
+        self.view.ask('Estado: ')
+        estado = input()
+        self.view.ask('Fecha: ')
+        fecha = input()
+        self.view.ask('Asunto: ')
+        asunto = input()
+        return [ lugar, ciudad, estado, fecha, asunto ]
+
+    def create_cita(self):
+        lugar, ciudad, estado, fecha, asunto = self.ask_cita()
+        out = self.model.create_cita(lugar, ciudad, estado, fecha, asunto)
+        # out = self.model.create_product(name, brand, descrip, price)
+        if out == True:
+            self.view.ok(lugar+' '+fecha+' '+asunto, 'agrego')
+        else:
+            self.view.error('NO SE PUDO AGREGAR LA CITA. REVISA')
+        return
+
+    def read_a_cita(self):
+        self.view.ask('ID cita: ')
+        id_cita = input()
+        cita = self.model.read_a_cita(id_cita)
+        if type(cita) == tuple:
+            self.view.show_cita_header(' Datos de la cita '+id_cita+' ')
+            self.view.show_a_cita(cita)
+            self.view.show_cita_midder()
+            self.view.show_cita_footer()
+        else:
+            if cita == None:
+                self.view.error('LA CITA NO EXISTE')
+            else:
+                self.view.error('PROBLEMA AL LEER LA CITA. REVISA')
+        return
+
+    def read_all_citas(self):
+        citas = self.model.read_all_citas()
+        if type(citas) == list:
+            self.view.show_cita_header(' Todas las citas ') 
+            for cita in citas:
+                self.view.show_a_cita(cita)
+                self.view.show_cita_midder()
+            self.view.show_cita_footer()
+        else:
+            self.view.error('PROBLEMA AL LEER LAS CITAS. REVISA')
+        return
+
+    def read_citas_asunto(self):
+        self.view.ask('Asunto: ')
+        asunto = input()
+        citas = self.model.read_citas_asunto(asunto)
+        if type(citas) == list:
+            self.view.show_cita_header(' Asunto de la cita '+asunto+' ')
+            for cita in citas:
+                self.view.show_a_cita(cita)
+                self.view.show_cita_midder()
+            self.view.show_cita_footer
+        else:
+            self.view.error('PROBLEMA AL LEER LAS CITAS. REVISA')
+        return
+
+    def read_cita_fecha(self):
+        self.view.ask('Fecha: ')
+        fecha = input()
+        citas = self.model.read_cita_fecha(fecha)
+        if type(citas) == list:
+            self.view.show_cita_header(' Fecha: '+fecha+' ')
+            for cita in citas:
+                self.view.show_a_cita(cita)
+                self.view.show_cita_midder() 
+            self.view.show_cita_footer() 
+        else:
+            self.view.error('PROBLEMA AL LEER LOS PRODUCTOS. REVISA')
+        return
+
+    def update_cita(self):
+        self.view.ask('ID de cita a modificar: ')
+        id_cita = input()
+        cita = self.model.read_a_cita(id_cita)    
+        if type(cita) == tuple:
+            self.view.show_cita_header(' Datos del producto '+id_cita+' ')
+            self.view.show_a_cita(cita)
+            self.view.show_cita_midder()
+            self.view.show_cita_footer()
+        else:
+            if cita == None:
+                self.view.error('LA CITA NO EXISTE')
+            else:
+                self.view.error('PROBLEMA AL LEER LAS CITAS. REVISA')
+            return
+        self.view.msg('Ingresa los valores a modificar (vacio para dejarlo igual): ')
+        whole_vals = self.ask_cita()
+        fields, vals = self.update_lists(['c_lugar', 'c_ciudad', 'c_estado', 'c_fecha', 'c_asunto'], whole_vals)
+        vals.append(id_cita)
+        vals = tuple(vals)
+        out = self.model.update_cita(fields,vals)
+        if out == True:
+            self.view.ok(id_cita, 'actualizo')
+        else:
+            self.view.error('NO SE PUDO ACTUALIZAR LA CITA. REVISA')
+        return      
+        
+    def delete_cita(self):
+        self.view.ask('Id de la cita a borrar: ')
+        id_cita = input()
+        count = self.model.delete_cita(id_cita)
+        if count != 0:
+            self.view.ok(id_cita, 'borro')
+        else:
+            if count == 0:
+                self.view.error('LA CITA NO EXISTE')
+            else:
+                self.view.error('PROBLEMA AL BORRAR LA CITA. REVISA.')
+        return
+
+    
+    """
+    ***********************************
+    *   Controllers for Contactos     *
+    ***********************************
+    """
+    def contacto_menu(self):
+        o = '0'
+        while o != '7':
+            self.view.contacto_menu()
+            self.view.option('7')
+            o = input()
+            if o == '1':
+                self.create_contacto()
+            elif o == '2':
+                self.read_a_contacto()
+            elif o == '3':
+                self.read_all_contactos()
+            elif o == '4':
+                self.read_contactos_zip()
+            elif o == '5':
+                self.update_contacto()
+            elif o == '6':
+                self.delete_contacto()
+            elif o == '7':
+                return
+            else:
+                self.view.not_valid_option()
+        return
+
+    def ask_contacto(self):
+        self.view.ask('Nombre: ')
+        name = input()
+        self.view.ask('Apellido paterno: ')
+        apellidoP = input()
+        self.view.ask('Apellido materno: ')
+        apellidoM = input()
+        self.view.ask('Calle: ')
+        calle = input()
+        self.view.ask('No. exterior: ')
+        noext = input()
+        self.view.ask('No interior: ')
+        noint = input()
+        self.view.ask('Colonia: ')
+        col = input()
+        self.view.ask('CP: ')
+        zip = input()
+        self.view.ask('Email: ')
+        email = input()
+        self.view.ask('Telefono: ')
+        phone = input()
+        return [ name, apellidoP, apellidoM, calle, noext, noint, col, zip, email, phone ]
+
+    def create_contacto(self):
+        name, apellidoP, apellidoM, calle, noext, noint, col, zip, email, phone = self.ask_contacto()
+        out = self.model.create_contacto(name, apellidoP, apellidoM, calle, noext, noint, col, zip, email, phone)
+        if out == True:
+            self.view.ok(name+' '+apellidoP+' '+apellidoM, 'agrego')
+        else:
+            self.view.error('NO SE PUDO AGREGAR EL CONTACTO. REVISA')
+        return
+    
+    def read_a_contacto(self):
+        self.view.ask('ID Contacto: ')
+        id_contacto = input()
+        contacto = self.model.read_a_contacto(id_contacto)
+        if type(contacto) == tuple:
+            self.view.show_contacto_header(' Datos del contacto '+id_contacto+' ')
+            self.view.show_a_contacto(id_contacto)
+            self.view.show_contacto_midder()
+            self.view.show_contacto_footer()
+        else:
+            if contacto == None:
+                self.view.error('EL CONTACTO NO EXISTE')
+            else:
+                self.view.error('PROBLEMA AL LLER EL CONTACTO. REVISA')
+        return
+    
+    def read_all_contactos(self):
+        contactos = self.model.read_all_contactos()
+        if type(contactos) == list:
+            self.view.show_contacto_header(' Todos los contacto ')
+            for contacto in contactos:
+                self.view.show_a_contacto(contacto)
+                self.view.show_contacto_midder()
+            self.view.show_contacto_footer()
+        else:
+            self.view.error('PROBLEMA AL LEER LOS CONTACTOS. REVISA')
+        return
+    
+    def read_contactos_zip(self):
+        self.view.ask('CP: ')
+        zip = input()
+        contactos = self.model.read_contactos_zip(zip)
+        if type(contactos) == list:
+            self.view.show_client_header(' Contactos en el CP '+contactos+' ')
+            for contacto in contactos:
+                self.view.show_a_contacto(contacto)
+                self.view.show_contacto_midder()
+            self.view.show_contacto_footer()
+        else:
+            self.view.error('PROBLEMA AL LEER LOS CCONTACTOS. REVISA')
+        return
+
+    def update_contacto(self):
+        self.view.ask('ID de contacto a modificar: ')
+        id_contacto = input()
+        contactos = self.model.read_a_contacto(id_contacto)
+        if type(contactos) == tuple:
+            self.view.show_contacto_header(' Datos del contacto '+id_contacto+' ')
+            self.view.show_a_contacto(contactos)
+            self.view.show_contacto_midder()
+            self.view.show_contacto_footer()
+        else:
+            if contactos == None:
+                self.view.error('EL CONTACTO NO EXISTE')
+            else:
+                self.view.error('PROBLEMA AL LEER EL CONTACTO. REVISA')
+            return
+        self.view.msg('Ingresa los valores a modificar (vacio para dejarlo igual): ')
+        whole_vals = self.ask_contacto()
+        fields, vals = self.update_lists(['c_nombre', 'c_apellidoP', 'c_apellidoM', 'c_calle', 'c_noext', 'c_noint', 'c_col', 'c_zip', 'c_email', 'c_telefono'], whole_vals)
+        vals.append(id_contacto)
+        vals = tuple(vals)
+        out = self.model.update_contacto(fields, vals)
+        if out == True:
+            self.view.ok(id_contacto, 'actualizo')
+        else:
+            self.view.error('NO SE PUDO ACTUALIZAR EL CONTACTO. REVISA')
+        return
+
+    def delete_contacto(self):
+        self.view.ask('ID de contacto a borrar: ')
+        id_contacto = input()
+        count = self.model.delete_contacto(id_contacto)
+        if count != 0:
+            self.view.ok(id_contacto, 'borro')
+        else:
+            if count == 0:
+                self.view.error('EL CONTACTO NO EXISTE')
+            else:
+                self.view.error('PROBLEMA AL BORRAR EL CONTACTO. REVISA')
+        return
+    
+
+    """
+    **************************************
+    *   Controllers for Detalles-Cita    *
+    **************************************
+    """
+    def create_detalles_cita(self, id_contacto):
+        od_total = 0.0
+        self.view.ask('ID cita: ')
+        id_cita = input()
+        if id_cita != '':
+            cita = self.model.read_a_cita(id_cita)
+            if type(cita) == tuple:
+                self.view.show_cita_header(' Datos de la cita '+id_cita+' ')
+                self.view.show_a_cita(cita)
+                self.view.show_cita_footer()
+                self.view.ask('nombre: ')
+                nombre = input()
+                self.view.ask('descripcion: ')
+                descripcion = input()
+                out = self.model.create_detalles_cita(id_cita, id_contacto, nombre, descripcion)
+                if out == True:
+                    self.view.ok(cita[1]+' '+cita[2], 'en detalles de cita')
+                else:
+                    if out.errno == 1062:
+                        self.view.error('LA CITA YA NO ESTA PROGRAMADA')
+                    else:
+                        self.view.error('NO SE PUDO AGREGAR LA CITA. REVISA')
+                    od_total = 0.0
+            else:
+                if cita == None:
+                    self.view.error('LA CITA NO EXISTE')
+                else:
+                    self.view.error('NO SE PUDO AGREGAR LA CITA. REVISA')
+        else:
+            if cita == None:
+                self.view.error('LA CITA NO EXISTE')
+            else:
+                self.view.error('PROBLEMA AL LEER LA CITA. REVISA')
+        return id_cita, od_total
+
+    def add_order_details(self):
+        contacto = self.read_a_contacto()  
+        if type(contacto) == tuple:
+            id_contacto = contacto[0]
+            c_total = contacto[4]
+            id_cita = ' '
+            while id_cita != '':
+                self.view.msg('---- Agregar citas al contacto (deja vacio el id de la cita para salir) ----')
+                id_cita, cd_total = self.create_detalles_cita(id_contacto)
+                c_total += cd_total
+            self.model.update_contacto( ('c_total = %s', ), (c_total, id_contacto))
+        return
+
+    def update_detalles_cita(self):
+        contacto = self.read_a_contacto()
+        if type(contacto) == tuple:
+            id_contacto = contacto[0]
+            nombre = contacto[4]
+            id_contacto = ' '
+            while id_contacto != '':
+                self.view.msg('---- Modifica citas del contacto (deja vacio el id de la cita para salir) ----')
+                self.view.ask('ID cita: ')
+                id_cita = input()
+                if id_cita != '':
+                    cita_detalles = self.model.read_detalle_cita(id_cita, id_contacto)
+                    if type(cita_detalles) == tuple:
+                        cd_total_old = cita_detalles[5]
+                        nombre -= cd_total_old
+                        # cit = self.model.read_a_cita(id_cita)
+                        self.view.ask('nombre: ')
+                        nombre = input()
+                        self.view.ask('descripcion: ')
+                        descripcion = input()
+                        fields, whole_vals = self.update_lists(['nombre','descripcion'], [nombre, descripcion])
+                        whole_vals.append(id_contacto)
+                        whole_vals.append(id_cita)
+                        self.model.update_detalles_cita(fields, whole_vals)
+                        self.view.ok(id_cita, 'citas actualizadas')
+                    else: 
+                        if cita_detalles == None:
+                            self.view.error('EL PRODUCTO NO EXITE EN LA ORDEN')
+                        else:
+                            self.view.error('PROBLEMA AL ACTUALIZAR EL PRODUCTO. REVISA.')
+            self.model.update_contacto(('nombre = %s',),(nombre, id_contacto))
+        return
+
+    def delete_detalles_cita(self):
+        contacto = self.read_a_contacto()
+        if type(contacto) == tuple:
+            id_contacto = contacto[0]
+            c_total = contacto[4]
+            id_cita = ' '
+            while id_cita != '':
+                self.view.msg('---- Borrar citas del contacto (deja vacio el id de la cita para salir) ---')
+                self.view.ask('ID cita: ')
+                id_cita = input()
+                if id_cita != '':
+                    detalle_cita = self.model.read_detalle_cita(id_cita, id_contacto)
+                    count = self.model.delete_detalles_cita(id_cita, id_contacto)
+                    if type(detalle_cita) == tuple and count != 0:
+                        dc_total = detalle_cita[5]
+                        c_total -= dc_total
+                        self.view.ok(id_cita, 'borro de las citas')
+                    else:
+                        if detalle_cita == None:
+                            self.view.error('LA CITA NO EXISTE EN EL CONTACTO')
+                        else:
+                            self.view.error('PROBLEMA AL BORRAR LA CITA. REVISA')
+            self.model.update_contacto( ('o_total = %s',),(c_total, id_contacto))
+        return

@@ -1,0 +1,304 @@
+from mysql  import connector
+
+class Model:
+    """"
+    **************************************
+    A data model with Mysql for a Diary DB 
+    **************************************
+    """
+
+    def __init__(self, config_db_file='config.txt'):
+        self.config_db_file = config_db_file
+        self.config_db = self.read_config_db()
+        self.connect_to_db()
+
+
+    def read_config_db(self):
+        d = {}
+        with open(self.config_db_file) as f_r:
+            for line in f_r:
+                (key, val) = line.strip().split(':')
+                d[key] = val
+        return d
+
+    def connect_to_db(self):
+        self.cnx = connector.connect(**self.config_db)
+        self.cursor = self.cnx.cursor()
+
+    def close_db(self):
+        self.cnx.close()
+
+
+    """
+    ******************************
+    ZIP methods
+    ******************************
+    """
+
+    def create_zip(self,zip, ciudad, estado):
+        try:
+            sql = 'INSERT INTO zips (`zip`, `z_ciudad`, `z_estado`) VALUES (%S, %S, %S)'
+            vals = (zip, ciudad, estado)
+            self.cursor.execute(sql, vals)
+            self.cnx.commit()
+            return True
+        except connector.Error as err:
+            self.cnx.rollback()
+            return err
+
+    def read_a_zip(self, zip):
+        try:
+            sql =  'SELECT * FROM zips WHERE zip = %s'
+            vals = (zip,)
+            self.cursor.execute(sql, vals)
+            record = self.cursor.fetchone()
+            return record
+        except connector.Error as err:
+            return err
+
+    def read_all_zips(self):
+        try:
+            sql =  'SELECT * FROM zips'
+            self.cursor.execute(sql)
+            record = self.cursor.fetchall()
+            return record
+        except connector.Error as err:
+            return err
+
+    def read_zips_city(self, city):
+        try:
+            sql =  'SELECT * FROM zips WHERE z_ciudad = %s'
+            vals = (city,)
+            self.cursor.execute(sql, vals)
+            record = self.cursor.fetchall()
+            return record
+        except connector.Error as err:
+            return err
+
+    def update_zip(self, fields, vals):
+        try:
+            sql =  'UPDATE zips SET '+','.join(fields)+' WHERE zip = %s'
+            self.cursor.execute(sql, vals)
+            self.cnx.commit()
+            return True
+        except connector.Error as err:
+            self.cnx.rollback()
+            return err
+
+    def delete_zip(self,zip):
+        try:
+            sql =  'DELETE FROM zips WHERE zip = %s'
+            vals = (zip,)
+            self.cursor.execute(sql, vals)
+            self.cnx.commit()
+            count = self.cursor.rowcount
+            return count
+        except connector.Error as err:
+            self.cnx.rollback()
+            return err
+
+
+    """
+    ******************************
+    *       Date methods     *
+    ******************************
+    """
+
+    def create_cita(self, lugar, ciudad, estado, fecha, asunto):
+        try:
+            sql = 'INSERT INTO cita (`c_lugar`, `c_ciudad`, `c_estado`, `c_fecha`, `c_asunto`) VALUES (%s, %s, %s, %s, %s)'
+            vals = (lugar, ciudad, estado, fecha, asunto)
+            self.cursor.execute(sql, vals)
+            self.cnx.commit()
+            return True
+        except connector.Error as err:
+            self.cnx.rollback()
+            return err
+
+    def read_a_cita(self, id_cita):
+        try:
+            sql =  'SELECT * FROM cita WHERE id_cita = %s'
+            vals = (id_cita,)
+            self.cursor.execute(sql, vals)
+            record = self.cursor.fetchone()
+            return record
+        except connector.Error as err:
+            return err
+
+    def read_all_citas(self):   #Caution with large amount of data
+        try:
+            sql =  'SELECT * FROM cita'
+            self.cursor.execute(sql)
+            record = self.cursor.fetchall()
+            return record
+        except connector.Error as err:
+            return err
+
+    def read_citas_asunto(self, asunto):
+        try:
+            sql =  'SELECT * FROM cita WHERE c_asunto = %s'
+            vals = (asunto,)
+            self.cursor.execute(sql, vals)
+            record = self.cursor.fetchall()
+            return record
+        except connector.Error as err:
+            return err
+
+    def read_cita_fecha(self, fecha):
+        try:
+            sql =  'SELECT * FROM cita WHERE c_fecha = %s'
+            vals = (fecha, )
+            self.cursor.execute(sql, vals)
+            record = self.cursor.fetchall()
+            return record
+        except connector.Error as err:
+            return err
+            
+    def update_cita(self, fields, vals):
+        try:
+            sql = 'UPDATE cita SET '+','.join(fields)+' WHERE id_cita = %s'
+            self.cursor.execute(sql, vals)
+            self.cnx.commit()
+            return True
+        except connector.Error as err:
+            self.cnx.rollback()
+            return err
+
+    def delete_cita(self, id_cita):
+        try:
+            sql =  'DELETE FROM cita WHERE id_cita = %s'
+            vals = (id_cita,)
+            self.cursor.execute(sql, vals)
+            self.cnx.commit()
+            count = self.cursor.rowcount
+            return count
+        except connector.Error as err:
+            self.cnx.rollback()
+            return err
+
+
+    """
+    ******************************
+    *       Contacto methods     *
+    ******************************
+    """
+    def create_contacto(self, name, apellidoP, apellidoM, calle, noext, noint, col, zip, email, phone):
+        try:
+            sql = 'INSERT INTO clients (`c_nombre`, `c_apellidoP`, `c_apellidoM`, `c_calle`, `c_noext`, `c_noint`, `c_col`, `c_zip`, `c_email`, `c_telefono`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+            vals = ( name, apellidoP, apellidoM, calle, noext, noint, col, zip, email, phone )
+            self.cursor.execute(sql, vals)
+            self.cnx.commit()
+            return True
+        except connector.Error as err:
+            self.cnx.rollback()
+            return err
+    
+    def read_a_contacto(self, id_contacto):
+        try:
+            sql =  'SELECT contacto.*,zips.z_city,zips.z_state FROM contacto JOIN zips ON contacto.c_zip = zips.zip and contacto.id_client = %s'
+            vals = (id_contacto,)
+            self.cursor.execute(sql, vals)
+            records = self.cursor.fetchone()
+            return records
+        except connector.Error as err:
+            return err
+
+    def read_all_contactos(self):   #Caution with large amount of data
+        try:
+            sql =  'SELECT contacto.*,zips.z_city, zips.z_state FROM contacto JOIN zips ON contacto.c_zip = zips.zip'
+            self.cursor.execute(sql)
+            records = self.cursor.fetchall()
+            return records
+        except connector.Error as err:
+            return err
+
+    def read_contactos_zip(self, zip):
+        try:
+            sql =  'SELECT contacto.*,zips.z_city,zips.z_state FROM contacto JOIN zips ON contacto.c_zip = zips.zip and contacto.c_zip = %s'
+            vals = (zip,)
+            self.cursor.execute(sql, vals)
+            records = self.cursor.fetchall()
+            return records
+        except connector.Error as err:
+            return err
+
+    def update_contacto(self, fields, vals):
+        try:
+            sql = 'UPDATE contacto SET '+','.join(fields)+' WHERE id_contacto = %s'
+            self.cursor.execute(sql, vals)
+            self.cnx.commit()
+            return True
+        except connector.Error as err:
+            self.cnx.rollback()
+            return err
+
+    def delete_contacto(self, id_contacto):
+        try:
+            sql =  'DELETE FROM contacto WHERE id_contacto = %s'
+            vals = (id_contacto,)
+            self.cursor.execute(sql, vals)
+            self.cnx.commit()
+            count = self.cursor.rowcount
+            return count
+        except connector.Error as err:
+            self.cnx.rollback()
+            return err
+
+    """
+    ******************************
+    *   Detalles-Cita methods    *
+    ******************************
+    """
+
+    def create_detalles_cita(self, id_cita, id_contacto, nombre, descripcion):
+        try:
+            sql = 'SELECT INTO detalles_cita (`id_cita`,`id_contacto`,`nombre`,`descripcion`) VALUES (%s, %s, %s, %s)'
+            vals = ( id_cita, id_contacto, nombre, descripcion )
+            self.cursor.execute(sql, vals)
+            self.cnx.commit()
+            return id_cita
+        except connector.Error as err:
+            self.cnx.rollback()
+            return err
+
+    def read_detalle_cita(self, id_cita, id_contacto):
+        try:
+            sql =  'SELECT contacto.id_contacto, contacto.c_nombre, contacto.c_apellidoP, contacto.c_apellidoM, contacto.c_fecha, contacto.c_asunto, detalles_cita.nombre detalles_cita.descripcion FROM detalles_cita JOIN contacto On detalles_cita.id_contacto = contacto.id_contacto and detalles_cita.id_cita = %s and detalles_cita.id_contacto = %s'
+            vals = (id_contacto, id_cita)
+            self.cursor.execute(sql, vals)
+            record = self.cursor.fetchone()
+            return record
+        except connector.Error as err:
+            return err  
+
+    def read_detalles_citas(self, id_cita):
+        try:
+            sql =  'SELECT contacto.id_contacto, contacto.c_nombre, contacto.c_apellidoP, contacto.c_apellidoM, contacto.c_fecha, contacto.c_asunto, detalles_cita.nombre detalles_cita.descripcion FROM detalles_cita JOIN contacto On detalles_cita.id_contacto = contacto.id_contacto and detalles_cita.id_cita = %s'
+            vals = (id_cita)
+            self.cursor.execute(sql, vals)
+            record = self.cursor.fetchall()
+            return record
+        except connector.Error as err:
+            return err  
+
+    def update_detalles_cita(self, fields, vals):
+        try:
+            sql = 'UPDATE detalles_cita SET '+','.join(fields)+' WHERE id_cita = %s and id_contacto = %s'
+            self.cursor.execute(sql, vals)
+            self.cnx.commit()
+            return True
+        except connector.Error as err:
+            self.cnx.rollback()
+            return err
+
+    def delete_detalles_cita(self, id_cita, id_contacto):
+        try:
+            sql =  'DELETE FROM detalles_cita WHERE id_cita = %s and id_contacto = %s'
+            vals = (id_cita, id_contacto)
+            self.cursor.execute(sql, vals)
+            self.cnx.commit()
+            count = self.cursor.rowcount
+            return count
+        except connector.Error as err:
+            self.cnx.rollback()
+            return err
