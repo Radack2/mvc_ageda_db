@@ -11,7 +11,8 @@ create table if not exists contacto(
     c_noext VARCHAR(7) NOT NULL,
     c_noint VARCHAR(7),
     c_col VARCHAR(35),
-    c_zip VARCHAR(6),
+    c_ciudad VARCHAR(35),
+    c_estado VARCHAR(35),
     c_email VARCHAR(35),
     c_telefono VARCHAR(15),
     PRIMARY KEY (id_contacto)
