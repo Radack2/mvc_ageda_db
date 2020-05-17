@@ -25,17 +25,15 @@ class Controller:
     """
     def main_menu(self):
         o = '0'
-        while 0 != '4':
+        while 0 != '3':
             self.view.main_menu()
-            self.view.option('4')
+            self.view.option('3')
             o = input()
             if o == '1':
-                self.zips_menu()
-            elif o == '2':
                 self.cita_menu()
-            elif o == '3':
+            elif o == '2':
                 self.contacto_menu()
-            elif o == '4':
+            elif o == '3':
                 self.view.end()
             else:
                 self.view.not_valid_option()
@@ -50,138 +48,6 @@ class Controller:
                 vals.append(v)
         return fields,vals
 
-
-    """
-    *********************************
-    *   Controllers for zips        *
-    *********************************
-    """
-    def zips_menu(self):
-        o = '0'
-        while o != '7':
-            self.view.zips_menu()
-            self.view.option('7')
-            o = input()
-            if o == '1':
-                self.create_zip()
-            elif o == '2':
-                self.read_a_zip()
-            elif o == '3':
-                self.read_all_zips()
-            elif o == '4':
-                self.read_zips_city()
-            elif o == '5':
-                self.update_zip()
-            elif o == '6':
-                self.delete_zip()
-            elif o == '7':
-                return
-            else:
-                self.view.not_valid_option()
-        return
-
-    def ask_zip(self):
-        self.view.ask('Ciudad: ')
-        ciudad = input()
-        self.view.ask('Estado: ')
-        estado = input()
-        return [ciudad, estado]
-
-    def create_zip(self):
-        self.view.ask('CP: ')
-        i_zip = input()
-        ciudad, estado = self.ask_zip()
-        out = self.model.create_zip(i_zip, ciudad, estado)
-        if out == True:
-            self.view.ok(i_zip, 'agrego')
-        else:
-            if out.errno == 1062:
-                self.view.error('EL CP ESTA REPETIDO')
-            else:
-                self.view.error('NO SE PUDO AGREGAR EL CP. REVISA.')
-        return
-
-    def read_a_zip(self):
-        self.view.ask('CP: ')
-        i_zip = input()
-        zip = self.model.read_a_zip(i_zip)
-        if type(zip) == tuple:
-            self.view.show_zip_header(' Datos del CP '+i_zip+' ')
-            self.view.show_a_zip(zip)
-            self.view.show_zip_midder()
-            self.view.show_zip_footer()
-        else:
-            if zip == None:
-                self.view.error('EL CP ESTA EXISTE')
-            else:
-                self.view.error('PROBLEMA AL LEER EL CP. REVISA.')
-
-    def read_all_zips(self):
-        zips = self.model.read_all_zips()
-        if type(zips) == list:
-            self.view.show_zip_header(' Todos los CPs ')
-            for zip in zips:
-                self.view.show_a_zip(zip)
-            self.view.show_zip_midder()
-            self.view.show_zip_footer()
-        else:
-            self.view.error('PROBLEMA AL LEER LOS CPs. REVISA.')
-        return
-
-    def read_zips_city(self):
-        self.view.ask('Ciudad: ')
-        ciudad = input()
-        zips = self.model.read_zips_city(ciudad)
-        if type(zips) == list:
-            self.view.show_zip_header(' CPs para la ciudad de '+ciudad+' ')
-            for zip in zips:
-                self.view.show_a_zip(zip)
-            self.view.show_zip_midder()
-            self.view.show_zip_footer()
-        else:
-            self.view.error('PROBLEMA AL LEER LOS CPs. REVISA.')
-        return
-
-    def update_zip(self):
-        self.view.ask('CP a modificar: ')
-        i_zip = input()
-        zip = self.model.read_a_zip(i_zip)
-        if type(zip) == tuple:
-            self.view.show_zip_header(' Datos del CP '+i_zip+' ')
-            self.view.show_a_zip(zip)
-            self.view.show_zip_midder()
-            self.view.show_zip_footer()
-        else:
-            if zip == None:
-                self.view.error('EL CP NO EXISTE')
-            else:
-                self.view.error('PROBLEMA AL LEER EL CP. REVISA.')
-        self.view.msg('Ingresa los valores a modificar (vacio para dejarlo igual): ')
-        whole_vals = self.ask_zip()
-        fields, vals = self.update_lists(['z_city', 'z_state'], whole_vals)
-        vals.append(i_zip)
-        vals = tuple(vals)
-        out = self.model.update_zip(fields, vals)
-        if out == True:
-            self.view.ok(i_zip, 'actualizo')
-        else:
-            self.view.error('NO SE PUEDE ACTUALIZAR EL CP. REVISA')
-        return
-
-    def delete_zip(self):
-            self.view.ask('CP a Borrar: ')
-            i_zip = input()
-            count = self.model.delete_zip(i_zip)
-            # print(out)
-            if count != 0:
-                self.view.ok(i_zip, 'borro')
-            else:
-                if count == 0:
-                    self.view.error('EL CP NO EXISTE')
-                else:
-                    self.view.error('PROBLEMA AL BORRAR EL CP. REVISA')
-            return
-    
 
     """
     *********************************
@@ -341,9 +207,9 @@ class Controller:
     """
     def contacto_menu(self):
         o = '0'
-        while o != '7':
+        while o != '6':
             self.view.contacto_menu()
-            self.view.option('7')
+            self.view.option('6')
             o = input()
             if o == '1':
                 self.create_contacto()
@@ -352,12 +218,10 @@ class Controller:
             elif o == '3':
                 self.read_all_contactos()
             elif o == '4':
-                self.read_contactos_zip()
-            elif o == '5':
                 self.update_contacto()
-            elif o == '6':
+            elif o == '5':
                 self.delete_contacto()
-            elif o == '7':
+            elif o == '6':
                 return
             else:
                 self.view.not_valid_option()
@@ -378,17 +242,19 @@ class Controller:
         noint = input()
         self.view.ask('Colonia: ')
         col = input()
-        self.view.ask('CP: ')
-        zip = input()
+        self.view.ask('Ciudad: ')
+        ciudad = input()
+        self.view.ask('Estado: ')
+        estado = input()
         self.view.ask('Email: ')
         email = input()
         self.view.ask('Telefono: ')
         phone = input()
-        return [ name, apellidoP, apellidoM, calle, noext, noint, col, zip, email, phone ]
+        return [ name, apellidoP, apellidoM, calle, noext, noint, col, ciudad, estado, email, phone ]
 
     def create_contacto(self):
-        name, apellidoP, apellidoM, calle, noext, noint, col, zip, email, phone = self.ask_contacto()
-        out = self.model.create_contacto(name, apellidoP, apellidoM, calle, noext, noint, col, zip, email, phone)
+        name, apellidoP, apellidoM, calle, noext, noint, col, ciudad, estado, email, phone = self.ask_contacto()
+        out = self.model.create_contacto(name, apellidoP, apellidoM, calle, noext, noint, col, ciudad, estado, email, phone)
         if out == True:
             self.view.ok(name+' '+apellidoP+' '+apellidoM, 'agrego')
         else:
@@ -421,20 +287,6 @@ class Controller:
             self.view.show_contacto_footer()
         else:
             self.view.error('PROBLEMA AL LEER LOS CONTACTOS. REVISA')
-        return
-    
-    def read_contactos_zip(self):
-        self.view.ask('CP: ')
-        zip = input()
-        contactos = self.model.read_contactos_zip(zip)
-        if type(contactos) == list:
-            self.view.show_client_header(' Contactos en el CP '+contactos+' ')
-            for contacto in contactos:
-                self.view.show_a_contacto(contacto)
-                self.view.show_contacto_midder()
-            self.view.show_contacto_footer()
-        else:
-            self.view.error('PROBLEMA AL LEER LOS CCONTACTOS. REVISA')
         return
 
     def update_contacto(self):
