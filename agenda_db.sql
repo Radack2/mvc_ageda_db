@@ -2,14 +2,6 @@ create database if not exists agenda_db;
 
 use agenda_db;
 
-create table if	not exists zips(
-	zip varchar(6) not null,
-    z_ciudad varchar(35) not null,
-    z_estado varchar(35) not null,
-    primary key(zip)
-)engine = INNODB;
-
-
 create table if not exists contacto(
 	id_contacto int not null auto_increment,
     c_nombre varchar(35) not null,
@@ -22,11 +14,9 @@ create table if not exists contacto(
     c_zip VARCHAR(6),
     c_email VARCHAR(35),
     c_telefono VARCHAR(15),
-    PRIMARY KEY (id_contacto),
-    CONSTRAINT fkzip_contacto FOREIGN KEY (c_zip)
-        REFERENCES zips (zip)
-        ON DELETE SET NULL ON UPDATE CASCADE
-)ENGINE=INNODB;
+    PRIMARY KEY (id_contacto)
+    
+) ENGINE=INNODB;
 
 create table if not exists cita(
 	id_cita int not null auto_increment,
@@ -35,9 +25,9 @@ create table if not exists cita(
     c_estado varchar(35),
     c_fecha date not null,
     c_asunto varchar(250),
-    
     primary key (id_cita)
-)ENGINE=INNODB;
+    
+) ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS detalles_cita (
 	id_cita int not null,
