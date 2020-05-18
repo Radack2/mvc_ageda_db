@@ -279,7 +279,7 @@ class Controller:
         contacto = self.model.read_a_contacto(id_contacto)
         if type(contacto) == tuple:
             self.view.show_contacto_header(' Datos del contacto '+id_contacto+' ')
-            self.view.show_a_contacto(id_contacto)
+            self.view.show_a_contacto(contacto)
             self.view.show_contacto_midder()
             self.view.show_contacto_footer()
         else:
