@@ -58,7 +58,7 @@ class Controller:
         o = '0'
         while o != '8':
             self.view.cita_menu()
-            self.view.option('8')
+            self.view.option('13')
             o = input()
             if o == '1':
                 self.create_cita()
@@ -73,8 +73,19 @@ class Controller:
             elif o == '6':
                 self.update_cita()
             elif o == '7':
-                self.delete_cita()
+                self.create_detalles_cita()
             elif o == '8':
+                self.add_detalles_cita()
+            elif o == '9':
+                self.read_detalles_citas()
+            elif o == '10':
+                self.update_detalles_cita()
+            elif o == '11':
+                self.delete_detalles_cita()
+            elif o == '12':
+                self.delete_cita()
+            elif o == '13':
+                self.main_menu()
                 return
             else:
                 self.view.not_valid_option()
@@ -156,7 +167,7 @@ class Controller:
                 self.view.show_cita_midder() 
             self.view.show_cita_footer() 
         else:
-            self.view.error('PROBLEMA AL LEER LOS PRODUCTOS. REVISA')
+            self.view.error('PROBLEMA AL LEER La CITA. REVISA')
         return
 
     def update_cita(self):
@@ -337,7 +348,6 @@ class Controller:
     **************************************
     """
     def create_detalles_cita(self, id_contacto):
-        od_total = 0.0
         self.view.ask('ID cita: ')
         id_cita = input()
         if id_cita != '':
@@ -358,7 +368,6 @@ class Controller:
                         self.view.error('LA CITA YA NO ESTA PROGRAMADA')
                     else:
                         self.view.error('NO SE PUDO AGREGAR LA CITA. REVISA')
-                    od_total = 0.0
             else:
                 if cita == None:
                     self.view.error('LA CITA NO EXISTE')
@@ -369,9 +378,9 @@ class Controller:
                 self.view.error('LA CITA NO EXISTE')
             else:
                 self.view.error('PROBLEMA AL LEER LA CITA. REVISA')
-        return id_cita, od_total
+        return id_cita
 
-    def add_order_details(self):
+    def add_detalles_cita(self):
         contacto = self.read_a_contacto()  
         if type(contacto) == tuple:
             id_contacto = contacto[0]
