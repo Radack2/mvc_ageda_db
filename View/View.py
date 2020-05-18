@@ -62,13 +62,9 @@ class View:
         print('4. Leer Citas por asunto')
         print('5. Leer Citas por fecha')
         print('6. Actualizar Cita')
-        print('7. Crear detalles de Cita')
-        print('8. Agregar detalles a una Cita')
-        print('9. Leer detalles de cita')
-        print('10. Actualizar detalles Cita')
-        print('11. Eliminar detalles de Cita')
-        print('12. Borrar Cita')
-        print('13. Regresar')
+        print('7. Borrar Cita')
+        print('8. Agregar contacto a cita')
+        print('9. Regresar')
 
     def show_a_cita(self, record):
         print('ID: ', record[0])

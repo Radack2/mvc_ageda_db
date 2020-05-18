@@ -125,7 +125,7 @@ class Model:
     
     def read_a_contacto(self, id_contacto):
         try:
-            sql =  'SELECT contacto.*, detalles_cita.nombre, detalles_cita.descripcion FROM contacto JOIN detalles_cita ON contacto.id_contacto = detalles_cita.id_contacto and detalles_cita.id_client = %s'
+            sql = 'SELECT  * FROM contacto WHERE id_contacto = %s'
             vals = (id_contacto,)
             self.cursor.execute(sql, vals)
             records = self.cursor.fetchone()
@@ -172,11 +172,11 @@ class Model:
 
     def create_detalles_cita(self, id_cita, id_contacto, nombre, descripcion):
         try:
-            sql = 'SELECT INTO detalles_cita (`id_cita`,`id_contacto`,`nombre`,`descripcion`) VALUES (%s, %s, %s, %s)'
+            sql = 'INSERT INTO detalles_cita (`id_cita`,`id_contacto`,`nombre`,`descripcion`) VALUES (%s, %s, %s, %s)'
             vals = ( id_cita, id_contacto, nombre, descripcion )
             self.cursor.execute(sql, vals)
             self.cnx.commit()
-            return id_cita
+            return True
         except connector.Error as err:
             self.cnx.rollback()
             return err

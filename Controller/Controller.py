@@ -73,18 +73,10 @@ class Controller:
             elif o == '6':
                 self.update_cita()
             elif o == '7':
-                self.create_detalles_cita()
-            elif o == '8':
-                self.add_detalles_cita()
-            elif o == '9':
-                self.read_detalles_citas()
-            elif o == '10':
-                self.update_detalles_cita()
-            elif o == '11':
-                self.delete_detalles_cita()
-            elif o == '12':
                 self.delete_cita()
-            elif o == '13':
+            elif o == '8':
+                self.create_detalles_cita()
+            elif o == '9':
                 self.main_menu()
                 return
             else:
@@ -107,8 +99,9 @@ class Controller:
     def create_cita(self):
         lugar, ciudad, estado, fecha, asunto = self.ask_cita()
         out = self.model.create_cita(lugar, ciudad, estado, fecha, asunto)
-        # out = self.model.create_product(name, brand, descrip, price)
+        id_cita = self.read_a_cita(asunto)
         if out == True:
+
             self.view.ok(lugar+' '+fecha+' '+asunto, 'agrego')
         else:
             self.view.error('NO SE PUDO AGREGAR LA CITA. REVISA')
@@ -208,6 +201,8 @@ class Controller:
                 self.view.error('LA CITA NO EXISTE')
             else:
                 self.view.error('PROBLEMA AL BORRAR LA CITA. REVISA.')
+
+        self.add_detalles_cita()
         return
 
     
@@ -360,37 +355,50 @@ class Controller:
                 nombre = input()
                 self.view.ask('descripcion: ')
                 descripcion = input()
-                out = self.model.create_detalles_cita(id_cita, id_contacto, nombre, descripcion)
-                if out == True:
-                    self.view.ok(cita[1]+' '+cita[2], 'en detalles de cita')
+                self.view.ask('ID contacto: ')
+                id_contacto = input()
+                if id_contacto != '':
+                    contacto = self.model.read_a_contacto(id_contacto)
+                    self.view.show_contacto_header(' Datos del contacto '+id_contacto+' ')
+                    self.view.show_a_contacto(contacto)
+                    self.view.show_contacto_midder()
+                    self.view.show_contacto_footer()
+                    if type(contacto) == tuple:
+                        out = self.model.create_detalles_cita(id_cita, id_contacto, nombre, descripcion)
+                        if out == True:
+                            self.view.ok(contacto[1],'Agrego')
+                        else:
+                            if out.errno == 1062:
+                                self.view.error('LA CITA YA NO ESTA PROGRAMADA')
+                            else:
+                                self.view.error('NO SE PUDO AGREGAR LA CITA. REVISA')
+
+                    else:
+                        if contacto == None:
+                            self.view.error('EL CONTACTO NO EXISTE')
+                        else:
+                            self.view.error('NO SE PUDO AGREGAR EL CONTACTO. REVISA')
                 else:
-                    if out.errno == 1062:
-                        self.view.error('LA CITA YA NO ESTA PROGRAMADA')
+                    if cita == None:
+                        self.view.error('LA CITA NO EXISTE')
                     else:
                         self.view.error('NO SE PUDO AGREGAR LA CITA. REVISA')
             else:
                 if cita == None:
                     self.view.error('LA CITA NO EXISTE')
                 else:
-                    self.view.error('NO SE PUDO AGREGAR LA CITA. REVISA')
-        else:
-            if cita == None:
-                self.view.error('LA CITA NO EXISTE')
-            else:
-                self.view.error('PROBLEMA AL LEER LA CITA. REVISA')
-        return id_cita
+                    self.view.error('PROBLEMA AL LEER LA CITA. REVISA')
+        return
 
     def add_detalles_cita(self):
         contacto = self.read_a_contacto()  
         if type(contacto) == tuple:
             id_contacto = contacto[0]
-            c_total = contacto[4]
             id_cita = ' '
             while id_cita != '':
                 self.view.msg('---- Agregar citas al contacto (deja vacio el id de la cita para salir) ----')
                 id_cita, cd_total = self.create_detalles_cita(id_contacto)
-                c_total += cd_total
-            self.model.update_contacto( ('c_total = %s', ), (c_total, id_contacto))
+            self.model.update_contacto( ('c_total = %s', ), (id_contacto))
         return
 
     def update_detalles_cita(self):
