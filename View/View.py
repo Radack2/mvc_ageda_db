@@ -1,7 +1,7 @@
 class View:
     """
     *******************************
-    *     A view for a store DB   *
+    *     A view for a agenda DB  *
     *******************************
     """
 
@@ -64,7 +64,11 @@ class View:
         print('6. Actualizar Cita')
         print('7. Borrar Cita')
         print('8. Agregar contacto a cita')
-        print('9. Regresar')
+        print('9. Leer contacto de una cita')
+        print('10. Leer citas de un contacto')
+        print('11. Actualizar detalles cita')
+        print('12. Eliminar contacto cita')
+        print('13. Regresar')
 
     def show_a_cita(self, record):
         print('ID: ', record[0])
@@ -140,16 +144,28 @@ class View:
     *   View for Detalles-Cita    *
     *******************************
     """
-    def show_a_order_details(self, record):
-        print(f'{record[0]:<5}|{record[1]:<20}|{record[2]:<20}|{record[3]:<11}|{record[4]:<9}|{record[5]:<11}')
+    def show_a_contacto_cita(self, record):
+        print('ID Contacto: ', record[0])
+        print('Nombre: ', record[1])
+        print('Apellido Paterno: ', record[2])
+        print('Apellido Materno: ', record[3])
+        print('Cita: ', record[4])
+        print('Nota: ', record[5])
+        print('ID Cita: ', record[6])
+        print('Lugar: ', record[7])
+        print('Fecha: ', record[8])
         
-    def show_detalles_cita_header(self):
-        print('-'*81)
-        print('ID'.ljust(5)+'|'+'Producto'.ljust(20)+'|'+'Marca'.ljust(20)+'|'+'Precio'.ljust(11)+'|'+'Cantidad'.ljust(9)+'|'+'Total'.ljust(11))
-        print('-'*81)
+    def show_contacto_cita_header(self, header):
+        print(header.center(53, '*'))
+        print('-'*48)
 
-    def show_detalles_cita_footer(self):
-        print('-'*81)
+    def show_contacto_cita_midder(self):
+        print('-'*53)
 
+    def show_contacto_cita_footer(self):
+        print('*'*53)
 
-    
+    def show_a_detalles_cita(self, record):
+        print('Nombre Cita: ', record[2])
+        print('Descripcion ', record[3])
+        

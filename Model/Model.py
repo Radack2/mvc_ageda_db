@@ -181,29 +181,39 @@ class Model:
             self.cnx.rollback()
             return err
 
-    def read_detalle_cita(self, id_cita, id_contacto):
+    def read_contactos_cita(self, id_cita):
         try:
-            sql =  'SELECT contacto.id_contacto, contacto.c_nombre, contacto.c_apellidoP, contacto.c_apellidoM, contacto.c_fecha, contacto.c_asunto, detalles_cita.nombre detalles_cita.descripcion FROM detalles_cita JOIN contacto On detalles_cita.id_contacto = contacto.id_contacto and detalles_cita.id_cita = %s and detalles_cita.id_contacto = %s'
-            vals = (id_contacto, id_cita)
-            self.cursor.execute(sql, vals)
-            record = self.cursor.fetchone()
-            return record
-        except connector.Error as err:
-            return err  
-
-    def read_detalles_citas(self, id_cita):
-        try:
-            sql =  'SELECT contacto.id_contacto, contacto.c_nombre, contacto.c_apellidoP, contacto.c_apellidoM, contacto.c_fecha, contacto.c_asunto, detalles_cita.nombre detalles_cita.descripcion FROM detalles_cita JOIN contacto On detalles_cita.id_contacto = contacto.id_contacto and detalles_cita.id_cita = %s'
-            vals = (id_cita)
+            sql = 'SELECT contacto.* FROM contacto JOIN detalles_cita ON contacto.id_contacto = detalles_cita.id_contacto and detalles_cita.id_cita = %s'
+            vals = (id_cita,)
             self.cursor.execute(sql, vals)
             record = self.cursor.fetchall()
             return record
         except connector.Error as err:
             return err  
 
+    def read_citas_contacto(self, id_contacto):
+        try:
+            sql =  'SELECT cita.* FROM cita JOIN detalles_cita ON cita.id_cita = detalles_cita.id_cita and detalles_cita.id_contacto = %s'
+            vals = (id_contacto,)
+            self.cursor.execute(sql, vals)
+            record = self.cursor.fetchall()
+            return record
+        except connector.Error as err:
+            return err 
+
+    def read_detalles_cita(self, id_cita):
+        try:
+            sql = 'SELECT * FROM detalles_cita WHERE id_cita = %s'
+            vals = (id_cita,)
+            self.cursor.execute(sql, vals)
+            record = self.cursor.fetchone()
+            return record
+        except connector.Error as err:
+            return err  
+
     def update_detalles_cita(self, fields, vals):
         try:
-            sql = 'UPDATE detalles_cita SET '+','.join(fields)+' WHERE id_cita = %s and id_contacto = %s'
+            sql = 'UPDATE detalles_cita SET '+','.join(fields)+' WHERE id_cita = %s'
             self.cursor.execute(sql, vals)
             self.cnx.commit()
             return True
@@ -211,10 +221,10 @@ class Model:
             self.cnx.rollback()
             return err
 
-    def delete_detalles_cita(self, id_cita, id_contacto):
+    def delete_detalles_cita(self, id_cita):
         try:
-            sql =  'DELETE FROM detalles_cita WHERE id_cita = %s and id_contacto = %s'
-            vals = (id_cita, id_contacto)
+            sql =  'DELETE FROM detalles_cita WHERE id_cita = %s'  
+            vals = (id_cita,)
             self.cursor.execute(sql, vals)
             self.cnx.commit()
             count = self.cursor.rowcount
