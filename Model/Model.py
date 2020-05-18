@@ -221,10 +221,10 @@ class Model:
             self.cnx.rollback()
             return err
 
-    def delete_detalles_cita(self, id_cita):
+    def delete_detalles_cita(self, id_cita,id_contacto):
         try:
-            sql =  'DELETE FROM detalles_cita WHERE id_cita = %s'  
-            vals = (id_cita,)
+            sql = 'DELETE id_contacto FROM detalles_cita WHERE id_cita = %s and id_contacto=%s'  
+            vals = (id_cita,id_contacto)
             self.cursor.execute(sql, vals)
             self.cnx.commit()
             count = self.cursor.rowcount

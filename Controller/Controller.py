@@ -83,7 +83,7 @@ class Controller:
             elif o == '11':
                 self.update_detalles_cita()
             elif o == '12':
-                self.delete_detalles_cita()
+                self.delete_usuario_cita()
             elif o == '13':
                 self.main_menu()
                 return
@@ -467,16 +467,24 @@ class Controller:
         return
 
        
-    def delete_detalles_cita(self):
-        self.read_all_detalles_citas()
-        self.view.ask('ID de la cita a borrar del contacto: ')
+    def delete_usuario_cita(self):
+        self.view.ask('ID de la cita a borrar contactos: ')
         id_cita = input()
-        count = self.model.delete_detalles_cita(id_cita)
+        contacto_cita = self.model.read_contactos_cita(id_cita)
+        contacto_cita = self.model.read_contactos_cita(id_cita)
+        self.view.show_contacto_cita_header('Usuarios dentro de Cita')
+        for contacto in contacto_cita:
+            self.view.show_a_contacto(contacto)
+            self.view.show_contacto_midder()
+        self.view.show_contacto_footer() 
+        self.view.ask('ID del contacto a eliminar: ')
+        id_contacto = input()
+        count = self.model.delete_detalles_cita(id_cita,id_contacto)
         if count != 0:
-            self.view.ok(id_cita, 'borro')
+            self.view.ok(id_contacto, 'borro')
         else:
             if count == 0:
-                self.view.error('LA CITA NO EXISTE')
+                self.view.error('ERROR NO SE PUDO ELIMINAR')
             else:
                 self.view.error('PROBLEMA AL BORRAR LA CITA DEL CONTACTO. REVISA')
         return

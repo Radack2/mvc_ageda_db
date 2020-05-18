@@ -16,5 +16,5 @@ m.start()
 # a = model.read_contactos_cita(2)
 # a =model.read_detalles_cita(2)
 
-# a = model.update_detalles_cita(['nombre = %s', 'descripcion = %s'],('hola', 'mundo', '2'))
+# a = model.update_detalles_cita(['nombre = %s', 'descripcion = %s'],('hola', 'ya me enfade', '2'))
 # print(a)
