@@ -347,7 +347,7 @@ class Controller:
     *   Controllers for Detalles-Cita    *
     **************************************
     """
-    def create_detalles_cita(self, id_contacto):
+    def create_detalles_cita(self):
         self.view.ask('ID cita: ')
         id_cita = input()
         if id_cita != '':
